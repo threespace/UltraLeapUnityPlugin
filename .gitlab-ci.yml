@@ -17,7 +17,7 @@ variables:
 
   # Path to CI folder in this repository
   CI_PATH: "CI"
-  CI_UNITY_PROJECTS_PATH: "$CI_PATH/Projects"
+  CI_UNITY_PROJECTS_PATH: "$CI_PATH/TestProjects"
   CI_SCRIPTS_PATH: "$CI_PATH/Scripts"
 
   # Paths to the UPM packages in this repository
@@ -347,6 +347,37 @@ dependencies-libtrack:
 
 #     when: on_failure
 
+.build-standalone-windows:
+  extends: .unity-template
+  stage: build
+  allow_failure: true
+  needs: []
+  rules:
+     - if: '$CI_PIPELINE_SOURCE == "schedule"'
+       when: always
+       allow_failure: false
+
+  variables:
+
+    TARGET_BUILD_PATH: "$ARTIFACTS_PATH_UNITY_PROJECT/standalone-windows.exe"
+
+  script:
+
+     # Build windows standalone
+     - echo "Beginning windows standalone build outputting to '$TARGET_BUILD_PATH' - log file outputting to '$UNITY_LOG_FILE'"
+     - $process = Start-Process -Wait -PassThru -FilePath "$UNITY_PATH" -ArgumentList "-batchmode -logFile `"$UNITY_LOG_FILE`" -projectPath `"$UNITY_PROJECT_PATH`" -buildWindowsPlayer `"$TARGET_BUILD_PATH"`"
+     - echo $process.ExitCode
+     - if (-not ($process.ExitCode -eq 0)) { exit $process.ExitCode }
+     - if ( -not (Test-Path "$TARGET_BUILD_PATH")) { echo "Error generating windows build"; exit 1; }
+
+  artifacts:
+    name: "$ARTIFACTS_NAME-build-standalone-windows"
+    paths:
+       - "$ARTIFACTS_PATH/"
+
+    when: always
+
+
 # -----------------------------------------------------------------------------
 # Exports all .unitypackages
 # -----------------------------------------------------------------------------
@@ -447,11 +478,18 @@ export-unitypackages:
   variables:
     UNITY_PROJECT_FOLDER: "2019.4"
 
+.unity-project-2020-lts-windows-openxr:
+  variables:
+    UNITY_PROJECT_FOLDER: "2020 LTS Windows OpenXR"
+
 # It's important to extend from the specific job templates first! Otherwise the empty UNITY_PROJECT_FOLDER variable in .unity-template will overwrite the one from here.
 # run-tests-2019.4:
 #   extends: ['.run-tests', '.unity-project-2019.4']
 #license-headers-2019.4:
 #  extends: ['.license-headers', '.unity-project-2019.4']
+
+build-standalone-windows-2020-lts-openxr:
+  extends: ['.build-standalone-windows', '.unity-project-2020-lts-windows-openxr']
 
 
 # -----------------------------------------------------------------------------
@@ -480,6 +518,8 @@ consolidate:
     #   artifacts: true
     #   optional: true
     - job: export-unitypackages
+      artifacts: true
+    - job: build-standalone-windows-2020-lts-openxr
       artifacts: true
 
   script:

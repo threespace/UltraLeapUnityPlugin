@@ -1,0 +1,20 @@
+{
+    "name": "com.ultraleap.testing.scenemenu",
+    "version": "1.0.0",
+    "description": "Scene menu implements a persistent menu for switching between scenes in an XR app",
+    "displayName": "Ultraleap Scene Menu",
+    "unity": "2020.3",
+    "license": "Apache-2.0",
+    "keywords": [
+      "ultraleap",
+      "leap motion",
+      "hand tracking",
+      "tracking"
+    ],
+    "documentationUrl": "https://docs.ultraleap.com/",
+    "author": {
+      "name": "Ultraleap",
+      "email": "contact@ultraleap.com",
+      "url": "https://www.ultraleap.com"
+    }
+  }
