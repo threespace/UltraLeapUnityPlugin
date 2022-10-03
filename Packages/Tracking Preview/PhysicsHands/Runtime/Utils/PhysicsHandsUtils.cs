@@ -261,9 +261,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public static PhysicMaterial CreateHandPhysicsMaterial()
         {
             PhysicMaterial material = new PhysicMaterial("HandPhysics");
-
-            material.dynamicFriction = 1f;
-            material.staticFriction = 1f;
+            // Reducing the friction a bunch makes hands feel more realistic
+            material.dynamicFriction = 0.1f;
+            material.staticFriction = 0.2f;
             material.frictionCombine = PhysicMaterialCombine.Average;
             material.bounceCombine = PhysicMaterialCombine.Minimum;
 
@@ -281,6 +281,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             palm.matchAnchors = false;
 #endif
             palm.mass = boneMass;
+            palm.linearDamping = 0f;
             palm.solverIterations = solverIterations;
             palm.solverVelocityIterations = solverVelocity;
             palm.angularDamping = angularDamping;
@@ -296,10 +297,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
             bone.matchAnchors = false;
 #endif
             bone.mass = boneMass;
+            bone.linearDamping = 0f;
             bone.solverIterations = solverIterations;
             bone.solverVelocityIterations = solverVelocity;
             bone.maxAngularVelocity = maxAngularVelocity;
             bone.maxDepenetrationVelocity = maxDepenetrationVelocity;
+            bone.jointFriction = 0.01f;
+
             bone.useGravity = false;
             bone.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         }
