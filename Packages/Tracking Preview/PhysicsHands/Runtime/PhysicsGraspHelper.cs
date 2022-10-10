@@ -36,8 +36,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private Dictionary<PhysicsHand, GraspValues> _graspingValues = new Dictionary<PhysicsHand, GraspValues>();
 
-        private List<GraspValues> _valuesD = new List<GraspValues>();
-
         [System.Serializable]
         public class GraspValues
         {
@@ -131,7 +129,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 SetBoneGrasping(item, false);
             }
             GraspState = State.Idle;
-            _valuesD.Clear();
             _graspingValues.Clear();
             _graspingCandidates.Clear();
             _boneHash.Clear();
@@ -300,7 +297,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 if (!_graspingValues.ContainsKey(hand))
                 {
                     _graspingValues.Add(hand, new GraspValues());
-                    _valuesD.Add(_graspingValues[hand]);
                 }
 
                 for (int i = 0; i < 5; i++)
