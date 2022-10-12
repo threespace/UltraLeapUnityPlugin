@@ -12,11 +12,11 @@ namespace Leap.Unity.Interaction.Experimental
             Exit
         }
 
-        protected HeuristicsManager _heuristicsManager;
+        protected GrabManager _grabManager;
 
-        public BaseHelper(HeuristicsManager heuristicsManager)
+        public BaseHelper(GrabManager grabManager)
         {
-            _heuristicsManager = heuristicsManager;
+            _grabManager = grabManager;
         }
 
         public abstract void OnCreate();

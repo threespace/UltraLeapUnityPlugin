@@ -93,6 +93,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     GameObject capsuleGameObject = new GameObject("", typeof(CapsuleCollider));
                     capsuleGameObject.name = $"{(handedness == Chirality.Left ? "Left" : "Right")} {IndexToFinger(fingerIndex)} Joint {jointIndex}";
+                    // This shouldn't be done here.
                     if (parent != null)
                     {
                         capsuleGameObject.layer = parent.layer;

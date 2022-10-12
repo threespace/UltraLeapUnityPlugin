@@ -57,8 +57,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public Pose previousPose;
         public Pose previousPalmPose;
 
-        private Vector3 _maxVelocityLerped = Vector3.zero;
-
         private Vector3 _newPosition;
         private Quaternion _newRotation;
 

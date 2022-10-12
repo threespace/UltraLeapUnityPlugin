@@ -7,12 +7,17 @@ namespace Leap.Unity.Interaction.Experimental
     public class GrabManager : MonoBehaviour
     {
         [field: SerializeField]
-        public HeuristicsManager Heuristics { get; private set; } = null;
+        public LeapInteractionManager InteractionManager { get; private set; } = null;
 
-
+        [SerializeField]
+        private GrabConfig _grabConfig = new GrabConfig();
+        
         public void Awake()
         {
+            if(InteractionManager.ModifiedProvider == null)
+            {
 
+            }
         }
 
         private void OnValidate()
@@ -22,9 +27,9 @@ namespace Leap.Unity.Interaction.Experimental
 
         private void ValidateProvider()
         {
-            if (Heuristics == null)
+            if (InteractionManager == null)
             {
-                Heuristics = FindObjectOfType<HeuristicsManager>();
+                InteractionManager = FindObjectOfType<LeapInteractionManager>();
             }
         }
 
