@@ -33,6 +33,10 @@ namespace Leap.Unity.Interaction.Experimental
         private PhysicMaterial _handMaterial;
         public PhysicMaterial HandMaterial => _handMaterial;
 
+        public int solverIterations = 50;
+        public int solverVelocityIterations = 20;
+        public float angularDamping = 50f, maxAngularVelocity = 1.75f, maxDepenetrationVelocity = 3f;
+
         public override SimHand GenerateHand(Chirality handedness)
         {
             GameObject go = new GameObject($"{(handedness == Chirality.Left ? "Left" : "Right")} Hand", typeof(PhysicsHand));
@@ -63,7 +67,7 @@ namespace Leap.Unity.Interaction.Experimental
 
         public override void PostHandGeneration()
         {
-            throw new System.NotImplementedException();
+            
         }
     }
 }

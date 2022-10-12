@@ -48,7 +48,7 @@ namespace Leap.Unity.Interaction.Experimental
             _palmBone = palmBone;
 
             _palmBone.SetEnvironment(this, 5, 0);
-            _palmBone.GenerateBone(null, null);
+            _palmBone.GeneratePalmBone(leapHand);
 
             _jointBones = new PhysicsBone[FINGERS * BONES];
 
