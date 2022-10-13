@@ -707,7 +707,5 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return 1 - input;
         }
 
-
-
     }
 }

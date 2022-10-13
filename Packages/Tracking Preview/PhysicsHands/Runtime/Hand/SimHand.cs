@@ -8,7 +8,7 @@ namespace Leap.Unity.Interaction.Experimental
     public abstract class SimHand : MonoBehaviour
     {
         protected SimProvider _provider;
-        public SimProvider Provider => _provider; 
+        public SimProvider Provider => _provider;
 
         [SerializeField]
         protected Chirality _handedness;
@@ -18,7 +18,7 @@ namespace Leap.Unity.Interaction.Experimental
         protected bool _handWasNull = false;
 
         protected int _layerMask = 0;
-        private int _handLayer = -1, _handResetLayer = -1;
+        protected int _handLayer = -1, _handResetLayer = -1;
 
         // For default hands this will only be a single bone but could be more for more complex hands
         [SerializeField, HideInInspector]
@@ -60,13 +60,21 @@ namespace Leap.Unity.Interaction.Experimental
             _dataHand.CopyFrom(hand);
             if (Time.inFixedTimeStep)
             {
-                UpdateHand();
+                // Simulation hands need to be within the physics timestep
+                UpdateHand(_dataHand, ref _modifiedHand);
             }
         }
 
         public abstract bool IsHandReady();
 
-        public abstract Hand GetHand();
+        public Hand GetHand()
+        {
+            if (IsHandReady())
+            {
+                return _modifiedHand;
+            }
+            return null;
+        }
 
         public void SetEnvironment(SimProvider provider, Chirality handedness)
         {
@@ -76,7 +84,13 @@ namespace Leap.Unity.Interaction.Experimental
 
         public abstract void GenerateHand();
 
-        protected abstract void UpdateHand();
+        /// <summary>
+        /// Within this function you should both receive and process the new data hand, and then return the modified hand
+        /// </summary>
+        /// <param name="dataHand">The raw input from the original Leap Provider</param>
+        /// <param name="dataHand">The modified output from your </param>
+        /// <returns></returns>
+        protected abstract void UpdateHand(Hand dataHand, ref Hand modifiedHand);
 
         public bool HasHandGenerated()
         {

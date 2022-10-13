@@ -22,6 +22,9 @@ namespace Leap.Unity.Interaction.Experimental
             }
         }
 
+        private BoxCollider _palmCollider { get { return (BoxCollider)_collider; } }
+        private CapsuleCollider _jointCollider { get { return (CapsuleCollider)_collider; } }
+
         private PhysicsProvider _physicsProvider { get { return (PhysicsProvider)_hand.Provider; } }
 
         [SerializeField, HideInInspector]
@@ -41,10 +44,8 @@ namespace Leap.Unity.Interaction.Experimental
 
         public override void GenerateBone(Bone bone, SimBone previous)
         {
+            _simCollider = new SimCollider(ColliderType.Capsule, transform);
             _body = gameObject.AddComponent<ArticulationBody>();
-            
-            GenerateJointBone();
-
             if (previous != null)
             {
                 previous._nextBone = this;
@@ -57,6 +58,7 @@ namespace Leap.Unity.Interaction.Experimental
 
         public override void GeneratePalmBone(Hand hand)
         {
+            _simCollider = new SimCollider(ColliderType.Box, transform);
             _isPalm = true;
             SetupPalmCollider(hand);
             SetupPalmBody();
@@ -69,11 +71,22 @@ namespace Leap.Unity.Interaction.Experimental
             {
                 _collider = gameObject.AddComponent<BoxCollider>();
             }
+            _palmCollider.center = new Vector3(0f, 0.0025f, -0.015f);
+            //_palmCollider.size = CalculatePalmSize(hand);
+            if (_physicsProvider.HandMaterial != null)
+            {
+                _palmCollider.material = _physicsProvider.HandMaterial;
+            }
         }
 
         private void SetupJointCollider(Bone bone)
         {
-
+            if (_collider == null)
+            {
+                _collider = gameObject.AddComponent<CapsuleCollider>();
+            }
+            CapsuleCollider collider = (CapsuleCollider)_collider;
+            
         }
 
         private void SetupPalmBody()
@@ -118,5 +131,7 @@ namespace Leap.Unity.Interaction.Experimental
         {
 
         }
+
+
     }
 }

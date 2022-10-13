@@ -37,6 +37,9 @@ namespace Leap.Unity.Interaction.Experimental
         [SerializeField, HideInInspector]
         protected Collider _collider;
 
+        public SimCollider SimCollider => _simCollider;
+        protected SimCollider _simCollider;
+
         public Vector3 oldPosition;
 
         public HashSet<Rigidbody> ContactingObjects => _contactObjects;
@@ -115,31 +118,46 @@ namespace Leap.Unity.Interaction.Experimental
             _nextBone = next;
         }
 
-        public void UpdateBone(Bone bone)
+        public virtual void UpdateBone(Bone bone)
         {
             _dataBone = bone;
+            
         }
 
         public void ComputeBone()
         {
-            if (_collider == null)
+            if (_dataBone != null)
             {
-                transform.position = _dataBone.Center;
-                transform.rotation = _dataBone.Rotation;
-                return;
+                if (_collider == null)
+                {
+                    transform.position = _dataBone.Center;
+                    transform.rotation = _dataBone.Rotation;
+                    if (_isPalm)
+                    {
+                        
+                    }
+                    else
+                    {
+                        _simCollider.ManualLeapBone(_dataBone);
+                    }
+                }
+                else
+                {
+                    if (_collider.GetType() == typeof(CapsuleCollider))
+                    {
+                        PhysicsHands.PhysExts.ToWorldSpaceCapsule((CapsuleCollider)_collider, out _computeCacheA, out _computeCacheB, out _computeRadius);
+                        _modifiedBone.PrevJoint = _computeCacheB;
+                        _modifiedBone.NextJoint = _computeCacheA;
+                        _modifiedBone.Width = _computeRadius;
+                        _modifiedBone.Center = (_modifiedBone.PrevJoint + _modifiedBone.NextJoint) / 2f;
+                        _modifiedBone.Direction = _modifiedBone.PrevJoint - _modifiedBone.NextJoint;
+                        _modifiedBone.Length = Vector3.Distance(_computeCacheA, _computeCacheB);
+                        _modifiedBone.Rotation = transform.rotation;
+                    }
+                    _simCollider.UpdateCollider(_collider);
+                }
             }
             
-            if (_collider.GetType() == typeof(CapsuleCollider))
-            {
-                PhysicsHands.PhysExts.ToWorldSpaceCapsule((CapsuleCollider)_collider, out _computeCacheA, out _computeCacheB, out _computeRadius);
-                _modifiedBone.PrevJoint = _computeCacheB;
-                _modifiedBone.NextJoint = _computeCacheA;
-                _modifiedBone.Width = _computeRadius;
-                _modifiedBone.Center = (_modifiedBone.PrevJoint + _modifiedBone.NextJoint) / 2f;
-                _modifiedBone.Direction = _modifiedBone.PrevJoint - _modifiedBone.NextJoint;
-                _modifiedBone.Length = Vector3.Distance(_computeCacheA, _computeCacheB);
-                _modifiedBone.Rotation = transform.rotation;
-            }
         }
     }
 }

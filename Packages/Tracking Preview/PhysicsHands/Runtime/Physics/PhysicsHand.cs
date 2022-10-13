@@ -20,15 +20,6 @@ namespace Leap.Unity.Interaction.Experimental
             return _hasReset;
         }
 
-        public override Hand GetHand()
-        {
-            if (_hasReset)
-            {
-                return _modifiedHand;
-            }
-            return null;
-        }
-
         #region Hand Generation
 
         public override void GenerateHand()
@@ -75,7 +66,6 @@ namespace Leap.Unity.Interaction.Experimental
                     bonePhys.SetEnvironment(this, fingerIndex, jointIndex);
                     bonePhys.GenerateBone(bone, jointIndex > 0 ? _jointBones[boneArrayIndex] : null);
 
-
                     _jointBones[boneArrayIndex] = bonePhys;
                 }
             }
@@ -85,10 +75,14 @@ namespace Leap.Unity.Interaction.Experimental
 
         #region Hand Updating
 
-        protected override void UpdateHand()
+        protected override void UpdateHand(Hand dataHand, ref Hand modifiedHand)
         {
-
+            
         }
+
+        #endregion
+
+        #region Hand Sizing
 
         #endregion
     }

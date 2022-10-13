@@ -11,7 +11,7 @@ namespace Leap.Unity.Interaction.Experimental
 
         [SerializeField]
         private GrabConfig _grabConfig = new GrabConfig();
-        
+
         public void Awake()
         {
             if(InteractionManager.ModifiedProvider == null)
