@@ -276,7 +276,7 @@ namespace Leap.Unity
         /// <summary>
         /// Determines if the service provider should temporally resample frames for smoothness.
         /// </summary>
-        protected bool _useInterpolation = true;
+        protected bool _useInterpolation = false;
 
         // Extrapolate on Android to compensate for the latency introduced by its graphics
         // pipeline.
