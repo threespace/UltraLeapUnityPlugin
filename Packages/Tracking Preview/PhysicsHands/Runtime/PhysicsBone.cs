@@ -46,6 +46,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public Collider Collider => _collider;
         private Collider _collider;
 
+        private RaycastHit[] _rayCache = new RaycastHit[8];
+        private Ray _graspRay = new Ray();
+
         public bool IsContacting
         {
             get
@@ -61,7 +64,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 return _graspingObjects.Count > 0;
             }
         }
-
 
         public void Awake()
         {
@@ -106,6 +108,48 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _currentXDriveLimit = _body.jointPosition[0] * Mathf.Rad2Deg;
             }
             _graspingObjects.Add(rigid);
+        }
+
+        public bool CalculateGraspDistance(out float distance)
+        {
+            distance = 0f;
+
+            if (Finger == 5 || Joint == 0 || _graspingObjects.Count == 0)
+                return false;
+
+            CapsuleCollider capsule = (CapsuleCollider)_collider;
+            // Move forward by 25% of the finger so that we're not off the very tip
+            Vector3 position = _collider.bounds.center + transform.rotation * new Vector3(0, 0, capsule.height * .25f);
+
+            _graspRay.origin = position;
+            _graspRay.direction = -transform.up;
+
+            int cols = Physics.RaycastNonAlloc(_graspRay, _rayCache, capsule.height, _hand.Provider.InteractionMask, QueryTriggerInteraction.Ignore);
+
+            bool found = false;
+
+            for (int i = 0; i < cols; i++)
+            {
+                if (_graspingObjects.Contains(_rayCache[i].rigidbody))
+                {
+                    if (!found)
+                    {
+                        distance = _rayCache[i].distance;
+                        found = true;
+                    }
+                    else if (_rayCache[i].distance < distance)
+                    {
+                        distance = _rayCache[i].distance;
+                    }
+                }
+            }
+
+            if (found)
+            {
+                Debug.DrawLine(position, position + distance * _graspRay.direction, Color.yellow, Time.fixedDeltaTime);
+            }
+
+            return found;
         }
 
         public void RemoveGrasping(Rigidbody rigid)

@@ -128,6 +128,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private int[] _graspingFingers = new int[5];
         private bool[] _wasGraspingBones;
         private float[] _graspingXDrives;
+        private float[] _graspingFingerDistances = new float[5];
 
         private bool _hasGenerated = false;
         private float _timeOnReset = 0;
@@ -361,17 +362,24 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 Bone knuckleBone = _originalLeapHand.Fingers[fingerIndex].Bone(0);
                 _graspingFingers[fingerIndex] = -1;
+                
                 if (IsGrasping)
                 {
-                    for (int jointIndex = 0; jointIndex < Hand.BONES; jointIndex++)
+                    for (int jointIndex = Hand.BONES - 1; jointIndex >= 0; jointIndex--)
                     {
                         int boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
                         if (_physicsHand.jointBones[boneArrayIndex].IsGrasping)
                         {
-                            _graspingFingers[fingerIndex] = jointIndex;
+                            if (_graspingFingers[fingerIndex] == -1)
+                            {
+                                _physicsHand.jointBones[boneArrayIndex].CalculateGraspDistance(out _graspingFingerDistances[fingerIndex]);
+                                _graspingFingers[fingerIndex] = jointIndex;
+                            }
+
                             _wasGraspingBones[boneArrayIndex] = true;
                         }
                     }
+
                 }
 
                 for (int jointIndex = 0; jointIndex < Hand.BONES; jointIndex++)
@@ -423,6 +431,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     ArticulationDrive xDrive = body.xDrive;
                     xDrive.stiffness = _physicsHand.stiffness * _physicsHand.strength;
+                    xDrive.damping = _graspingFingers[fingerIndex] > jointIndex ? 30f : 1f;
                     xDrive.forceLimit = _wasGraspingBones[boneArrayIndex] ? 0.05f / Time.fixedDeltaTime : _physicsHand.forceLimit * _physicsHand.strength / Time.fixedDeltaTime;
                     xDrive.upperLimit = _graspingFingers[fingerIndex] > jointIndex ? body.xDrive.target : _physicsHand.jointBones[boneArrayIndex].OriginalXDriveLimit;
                     xDrive.target = _wasGraspingBones[boneArrayIndex] ? Mathf.Clamp(xTargetAngle, body.xDrive.lowerLimit, _graspingXDrives[boneArrayIndex]) : xTargetAngle;
