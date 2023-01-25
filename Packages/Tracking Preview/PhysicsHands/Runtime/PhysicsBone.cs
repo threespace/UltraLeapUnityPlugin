@@ -30,10 +30,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         [SerializeField, HideInInspector]
         private ArticulationBody _body;
+
+        // Drive Limits
         [SerializeField, HideInInspector]
-        private float _origXDriveLimit = float.MaxValue, _currentXDriveLimit = float.MaxValue;
-        public float OriginalXDriveLimit => _origXDriveLimit;
-        public float XDriveLimit => _currentXDriveLimit;
+        private float _origXDriveLower = float.MaxValue, _origXDriveUpper = float.MaxValue, _currentXDriveUpper = float.MaxValue;
+        private float _origYDriveLower = float.MaxValue, _origYDriveUpper = float.MaxValue;
+        public float OriginalXDriveLower => _origXDriveLower;
+        public float OriginalXDriveUpper => _origXDriveUpper;
+        public float OriginalYDriveLower => _origYDriveLower;
+        public float OriginalYDriveUpper => _origYDriveUpper;
+        public float XDriveLimit => _currentXDriveUpper;
 
         public int Finger => _finger;
         [SerializeField, HideInInspector]
@@ -87,7 +93,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
             if (_body != null)
             {
-                _origXDriveLimit = _body.xDrive.upperLimit;
+                _origXDriveLower = _body.xDrive.lowerLimit;
+                _origXDriveUpper = _body.xDrive.upperLimit;
+                _origYDriveLower = _body.yDrive.lowerLimit;
+                _origYDriveUpper = _body.yDrive.upperLimit;
             }
         }
 
@@ -105,7 +114,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             if (_graspingObjects.Count == 0 && _body != null && _body.jointPosition.dofCount > 0)
             {
-                _currentXDriveLimit = _body.jointPosition[0] * Mathf.Rad2Deg;
+                _currentXDriveUpper = _body.jointPosition[0] * Mathf.Rad2Deg;
             }
             _graspingObjects.Add(rigid);
         }
@@ -118,7 +127,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 return false;
 
             CapsuleCollider capsule = (CapsuleCollider)_collider;
-            // Move forward by 25% of the finger so that we're not off the very tip
+            // Move forward from center by 25% of the finger so that we're not off the very tip
             Vector3 position = _collider.bounds.center + transform.rotation * new Vector3(0, 0, capsule.height * .25f);
 
             _graspRay.origin = position;
@@ -143,6 +152,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                 }
             }
+
+            distance = Mathf.Clamp(distance - capsule.radius, 0, float.MaxValue);
 
             if (found)
             {

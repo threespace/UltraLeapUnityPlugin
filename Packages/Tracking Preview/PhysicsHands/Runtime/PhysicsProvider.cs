@@ -144,6 +144,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public Action<Rigidbody, PhysicsGraspHelper> OnObjectStateChange;
 
+        public float distanceCheck = 0.008f;
+
         private int _leftIndex = -1, _rightIndex = -1;
         private Hand _leftOriginalLeap, _rightOriginalLeap;
         private float _physicsSyncTime = 0f;

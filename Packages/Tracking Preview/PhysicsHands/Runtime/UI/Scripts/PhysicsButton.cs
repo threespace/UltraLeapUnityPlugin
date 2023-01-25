@@ -258,7 +258,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             if (_provider != null)
             {
+                ResetOnBadState();
                 ProcessPhysicsEvents();
+            }
+        }
+
+        private void ResetOnBadState()
+        {
+            if(_buttonElement.transform.localRotation.eulerAngles.magnitude > 1f)
+            {
+                _buttonElement.transform.localRotation = Quaternion.identity;
             }
         }
 

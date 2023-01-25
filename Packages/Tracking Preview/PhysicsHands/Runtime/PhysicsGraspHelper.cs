@@ -432,12 +432,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     if (fist.Value.fingerStrength[i] != -1)
                     {
                         c++;
-                        if (c == 2)
-                            break;
                     }
                 }
 
-                if (c == 2)
+                if (c >= 2)
                 {
                     SetBoneGrasping(fist, true);
                     continue;
@@ -459,18 +457,40 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void SetBoneGrasping(KeyValuePair<PhysicsHand, GraspValues> pair, bool add)
         {
+            for (int i = 0; i < pair.Value.fingerStrength.Length; i++)
+            {
+                if (pair.Value.fingerStrength[i] != -1)
+                {
+                    for (int k = 0; k < PhysicsHand.Hand.BONES; k++)
+                    {
+                        pair.Key.GetPhysicsHand().jointBones[i * PhysicsHand.Hand.BONES + k].AddGrasping(_rigid);
+                    }
+                }
+                else
+                {
+                    for (int k = 0; k < PhysicsHand.Hand.BONES; k++)
+                    {
+                        pair.Key.GetPhysicsHand().jointBones[i * PhysicsHand.Hand.BONES + k].RemoveGrasping(_rigid);
+                    }
+                }
+            }
+
             if (add)
             {
                 for (int j = 0; j < _bones[pair.Key].Length; j++)
                 {
                     if (_bones[pair.Key][j].Count > 0)
                     {
-                        foreach (var item in pair.Key.GetPhysicsHand().jointBones)
+                        int finger = _bones[pair.Key][j].First().Finger;
+                        if (finger == 5)
                         {
-                            if (item.Finger == _bones[pair.Key][j].First().Finger)
-                            {
-                                item.AddGrasping(_rigid);
-                            }
+                            pair.Key.GetPhysicsHand().palmBone.AddGrasping(_rigid);
+                            continue;
+                        }
+
+                        for (int k = 0; k < PhysicsHand.Hand.BONES; k++)
+                        {
+                            pair.Key.GetPhysicsHand().jointBones[finger * PhysicsHand.Hand.BONES + k].AddGrasping(_rigid);
                         }
                     }
                 }
